@@ -1,5 +1,6 @@
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
+import { Container, Row, Col } from 'reactstrap';
 
 import { loginRequest } from '../../UserActions';
 
@@ -16,13 +17,18 @@ class UserLoginPage extends Component {
 
     handleLogin(email, password) {
         this.props.dispatch(loginRequest(email, password));
-        this.props.history.push('/');
     }
 
     render() {
         return (
             <div>
-                <UserLoginForm login={this.handleLogin} />
+                <Container>
+                    <Row>
+                        <Col md={{ size: 6, offset: 3 }}>
+                            <UserLoginForm login={this.handleLogin} />
+                        </Col>
+                    </Row>
+                </Container>
             </div>
         );
     }

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { Container, Row, Col } from 'reactstrap';
 
 import { registerRequest } from '../../UserActions';
 
@@ -22,7 +23,13 @@ class UserRegisterPage extends Component {
     render() {
         return (
             <div>
-                <UserRegisterForm register={this.handleRegister} />
+                <Container>
+                    <Row>
+                        <Col md={{ size: 6, offset: 3 }}>
+                            <UserRegisterForm register={this.handleRegister} />
+                        </Col>
+                    </Row>
+                </Container>
             </div>
         );
     }

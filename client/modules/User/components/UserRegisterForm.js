@@ -1,6 +1,8 @@
 import React, { PropTypes, Component } from 'react';
 import { injectIntl, FormattedMessage } from 'react-intl';
-import { Row, Col, Card, CardHeader, CardBlock, Button, Form, FormGroup, Label, Input, Alert } from 'reactstrap';
+import { Link } from 'react-router';
+import { Row, Col, Card, CardHeader, CardBlock, ButtonGroup, Button, Form, FormGroup, Label, Input, Alert } from 'reactstrap';
+import FontAwesome from 'react-fontawesome';
 
 export class UserRegisterForm extends Component {
 
@@ -9,9 +11,9 @@ export class UserRegisterForm extends Component {
         this.state = {
             email: '',
             password: '',
-            name: '',
-            error: false,
-            message : ''
+            lastname: '',
+            firstname: '',
+            errorFields: []
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -28,14 +30,32 @@ export class UserRegisterForm extends Component {
 
     handleSubmit(event) {
         event.preventDefault();
-        if(this.state.email && this.state.password && this.state.name) {
-            this.props.register(this.state.email, this.state.password, this.state.name);
+        if(this.state.email && this.state.password && this.state.lastname && this.state.firstname) {
+            this.props.register({email: this.state.email, password: this.state.password, lastname: this.state.lastname, firstname: this.state.firstname});
         } else {
+            let errorFields = [];
+            if(!this.state.email) {
+                errorFields.push('email');
+            }
+            if(!this.state.password) {
+                errorFields.push('password');
+            }
+            if(!this.state.lastname) {
+                errorFields.push('lastname');
+            }
+            if(!this.state.firstname) {
+                errorFields.push('firstname');
+            }
             this.setState({
-                error: true,
-                message: 'Please fill all fields !'
-            })
+                errorFields: errorFields
+            });
+            displayErrors('error', 'Veuillez remplir tous les champs !');
         }
+    }
+
+
+    hasErrorField(name) {
+        return this.state.errorFields.indexOf(name) !== -1;
     }
 
     render() {
@@ -45,34 +65,39 @@ export class UserRegisterForm extends Component {
                     <CardHeader><FormattedMessage id="userRegister" /></CardHeader>
                     <CardBlock>
                         <Form onSubmit={this.handleSubmit}>
-                            <FormGroup>
-                                <Label for="nameField"><FormattedMessage id="userName" /></Label>
-                                <Input type="text" name="name" id="nameField" onChange={this.handleChange} placeholder={this.props.intl.messages.userName} value={this.state.name} />
-                            </FormGroup>
+                            <Row>
+                                <Col sm="6" className={this.hasErrorField('firstname') ? 'has-danger' : ''}>
+                                    <FormGroup>
+                                        <Label for="firstnameField">Prénom</Label>
+                                        <Input type="text" name="firstname" id="firstnameField" className={this.hasErrorField('firstname') ? 'form-control-danger' : ''} onChange={this.handleChange}  value={this.state.firstname} />
+                                    </FormGroup>
+                                </Col>
+                                <Col sm="6" className={this.hasErrorField('lastname') ? 'has-danger' : ''}>
+                                    <FormGroup>
+                                        <Label for="lastnameField">Nom</Label>
+                                        <Input type="text" name="lastname" id="lastnameField" className={this.hasErrorField('lastname') ? 'form-control-danger' : ''} onChange={this.handleChange}  value={this.state.lastname} />
+                                    </FormGroup>
+                                </Col>
+                            </Row>
                             <FormGroup>
                                 <Row>
-                                    <Col sm="6">
+                                    <Col sm="6" className={this.hasErrorField('email') ? 'has-danger' : ''}>
                                         <Label for="emailField">Email</Label>
-                                        <Input type="text" name="email" id="emailField" onChange={this.handleChange} placeholder={this.props.intl.messages.userEmail} value={this.state.email} />
+                                        <Input type="text" name="email" id="emailField" className={this.hasErrorField('email') ? 'form-control-danger' : ''} onChange={this.handleChange} placeholder={this.props.intl.messages.userEmail} value={this.state.email} />
                                     </Col>
-                                    <Col sm="6">
+                                    <Col sm="6" className={this.hasErrorField('password') ? 'has-danger' : ''}>
                                         <Label for="passwordField"><FormattedMessage id="userPassword" /></Label>
-                                        <Input type="password" name="password" id="passwordField" onChange={this.handleChange} placeholder={this.props.intl.messages.userPassword} value={this.state.password} />
+                                        <Input type="password" name="password" id="passwordField" className={this.hasErrorField('password') ? 'form-control-danger' : ''} onChange={this.handleChange} placeholder={this.props.intl.messages.userPassword} value={this.state.password} />
                                     </Col>
                                 </Row>
                             </FormGroup>
                             <FormGroup>
-                                <Button color="success" block><FormattedMessage id="submit" /></Button>
+                                <ButtonGroup className="btn-block">
+                                    <Button color="secondary" outline tag={Link} to="/">Retour</Button>
+                                    <Button  color="success" block disabled={!this.state.email || !this.state.password || !this.state.lastname || !this.state.firstname}><FontAwesome name="check" /> Valider</Button>
+                                </ButtonGroup>
                             </FormGroup>
                         </Form>
-                        {
-                            this.state.error
-                            ?
-                                <Alert color="danger">
-                                    {this.state.message}
-                                </Alert>
-                            : ''
-                        }
                     </CardBlock>
                 </Card>
             </div>

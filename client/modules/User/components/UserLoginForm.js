@@ -1,6 +1,10 @@
 import React, { PropTypes, Component } from 'react';
 import { injectIntl, FormattedMessage } from 'react-intl';
-import { Row, Col, Card, CardHeader, CardBlock, Button, Form, FormGroup, Label, Input, Alert } from 'reactstrap';
+import { Link } from 'react-router';
+import { Row, Col, Card, CardHeader, CardBlock, ButtonGroup, Button, Form, FormGroup, Label, Input, Alert } from 'reactstrap';
+import FontAwesome from 'react-fontawesome';
+
+import { displayErrors } from '../../Error/ErrorActions';
 
 export class UserLoginForm extends Component {
 
@@ -9,8 +13,7 @@ export class UserLoginForm extends Component {
         this.state = {
             email: '',
             password: '',
-            error: false,
-            message : ''
+            errorFields: []
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -30,11 +33,22 @@ export class UserLoginForm extends Component {
         if(this.state.email && this.state.password ) {
             this.props.login(this.state.email, this.state.password);
         } else {
+            let errorFields = [];
+            if(!this.state.email) {
+                errorFields.push('email');
+            }
+            if(!this.state.password) {
+                errorFields.push('password');
+            }
             this.setState({
-                error: true,
-                message: 'Please fill all fields !'
-            })
+                errorFields: errorFields
+            });
+            displayErrors('error', 'Veuillez remplir tous les champs !');
         }
+    }
+
+    hasErrorField(name) {
+        return this.state.errorFields.indexOf(name) !== -1;
     }
 
     render() {
@@ -46,28 +60,23 @@ export class UserLoginForm extends Component {
                         <Form onSubmit={this.handleSubmit}>
                             <FormGroup>
                                 <Row>
-                                    <Col sm="6">
+                                    <Col sm="6" className={this.hasErrorField('email') ? 'has-danger' : ''}>
                                         <Label for="emailField">Email</Label>
-                                        <Input type="text" name="email" id="emailField" onChange={this.handleChange} placeholder={this.props.intl.messages.userEmail} value={this.state.email} />
+                                        <Input type="text" name="email" id="emailField" className={this.hasErrorField('email') ? 'form-control-danger' : ''} onChange={this.handleChange} placeholder={this.props.intl.messages.userEmail} value={this.state.email} />
                                     </Col>
-                                    <Col sm="6">
+                                    <Col sm="6" className={this.hasErrorField('password') ? 'has-danger' : ''}>
                                         <Label for="passwordField"><FormattedMessage id="userPassword" /></Label>
-                                        <Input type="password" name="password" id="passwordField" onChange={this.handleChange} placeholder={this.props.intl.messages.userPassword} value={this.state.password} />
+                                        <Input type="password" name="password" id="passwordField" className={this.hasErrorField('password') ? 'form-control-danger' : ''} onChange={this.handleChange} placeholder={this.props.intl.messages.userPassword} value={this.state.password} />
                                     </Col>
                                 </Row>
                             </FormGroup>
                             <FormGroup>
-                                <Button  color="success" block><FormattedMessage id="submit" /></Button>
+                                <ButtonGroup className="btn-block">
+                                    <Button color="secondary" outline tag={Link} to="/">Retour</Button>
+                                    <Button  color="success" block disabled={!this.state.email || !this.state.password}><FontAwesome name="power-off" /> Se connecter</Button>
+                                </ButtonGroup>
                             </FormGroup>
                         </Form>
-                        {
-                            this.state.error
-                            ?
-                                <Alert color="danger">
-                                    this.state.message
-                                </Alert>
-                            : ''
-                        }
                     </CardBlock>
                 </Card>
             </div>
